@@ -1,0 +1,5 @@
+pygame==2.4.0
+numpy>=1.24.3
+torch>=2.0.1  # For CPU-only installation
+# For CUDA support, install PyTorch separately:
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
