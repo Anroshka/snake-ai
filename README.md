@@ -82,7 +82,7 @@ python train.py
 
 ## License
 
-MIT License - feel free to use this code for your own projects.
+MIT License - feel free to use this code for your own projects. For more details, see the [LICENSE](LICENSE) file.
 
 ## Contributing
 
