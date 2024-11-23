@@ -87,3 +87,9 @@ MIT License - feel free to use this code for your own projects. For more details
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+## Reporting Issues and Requesting Features
+
+If you encounter any issues or have ideas for new features, please open an issue on GitHub. Provide as much detail as possible, including steps to reproduce the issue, expected behavior, and any relevant screenshots or logs.
+
+For more information on contributing, see the [CONTRIBUTING.md](CONTRIBUTING.md) file.
