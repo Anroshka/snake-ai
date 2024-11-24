@@ -6,6 +6,11 @@ from collections import deque
 import random
 import os
 
+# Оптимизации CUDA
+torch.backends.cudnn.benchmark = True
+torch.backends.cudnn.deterministic = False
+torch.set_float32_matmul_precision('high')
+
 # Проверяем доступность CUDA и выводим информацию
 print("PyTorch version:", torch.__version__)
 print("CUDA is available:", torch.cuda.is_available())

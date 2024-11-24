@@ -14,8 +14,15 @@ def train():
     episodes = 1000
     max_steps = 1000
     target_update_freq = 5
-    render_freq = 50  # Частота отображения игры
+    render_freq = 200  # Уменьшаем частоту отрисовки для ускорения
     save_freq = 100   # Частота сохранения модели
+    
+    # Отключаем синхронизацию CUDA для ускорения
+    if torch.cuda.is_available():
+        torch.cuda.synchronize()
+    
+    # Включаем многопоточность для CPU
+    torch.set_num_threads(4)
     
     best_score = 0
     scores = []
