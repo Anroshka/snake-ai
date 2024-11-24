@@ -32,11 +32,63 @@ class DQN(nn.Module):
     def forward(self, x):
         return self.network(x)
 
+class PrioritizedReplayBuffer:
+    def __init__(self, capacity, alpha=0.6, beta=0.4):
+        self.capacity = capacity
+        self.alpha = alpha  # Определяет, насколько сильно приоритет влияет на выборку
+        self.beta = beta    # Важность весов для коррекции смещения
+        self.beta_increment = 0.001  # Постепенное увеличение beta до 1
+        self.memory = []
+        self.priorities = np.zeros(capacity, dtype=np.float32)
+        self.position = 0
+        self.max_priority = 1.0
+    
+    def store(self, state, action, reward, next_state, done):
+        state = np.array(state, dtype=np.float32)
+        next_state = np.array(next_state, dtype=np.float32)
+        
+        if len(self.memory) < self.capacity:
+            self.memory.append((state, action, reward, next_state, done))
+        else:
+            self.memory[self.position] = (state, action, reward, next_state, done)
+        
+        # Новый опыт получает максимальный приоритет
+        self.priorities[self.position] = self.max_priority
+        self.position = (self.position + 1) % self.capacity
+    
+    def sample(self, batch_size):
+        if len(self.memory) < batch_size:
+            return None, None, None
+        
+        # Вычисляем вероятности выборки на основе приоритетов
+        probs = self.priorities[:len(self.memory)]
+        probs = probs ** self.alpha
+        probs = probs / probs.sum()
+        
+        # Выбираем индексы на основе приоритетов
+        indices = np.random.choice(len(self.memory), batch_size, p=probs)
+        
+        # Вычисляем веса важности
+        weights = (len(self.memory) * probs[indices]) ** (-self.beta)
+        weights = weights / weights.max()
+        self.beta = min(1.0, self.beta + self.beta_increment)
+        
+        batch = [self.memory[idx] for idx in indices]
+        states, actions, rewards, next_states, dones = zip(*batch)
+        
+        return (np.array(states), np.array(actions), np.array(rewards),
+                np.array(next_states), np.array(dones)), weights, indices
+    
+    def update_priorities(self, indices, td_errors):
+        for idx, error in zip(indices, td_errors):
+            self.priorities[idx] = (abs(error) + 1e-6) ** self.alpha
+            self.max_priority = max(self.max_priority, self.priorities[idx])
+
 class QLearningAgent:
     def __init__(self, input_size=12, hidden_size=256, output_size=4, 
-                 learning_rate=0.001, gamma=0.95, epsilon=1.0, 
-                 epsilon_min=0.01, epsilon_decay=0.997, memory_size=100000,
-                 batch_size=64):
+                 learning_rate=0.001, gamma=0.99, epsilon=1.0, 
+                 epsilon_min=0.01, epsilon_decay=0.995, memory_size=100000,
+                 batch_size=128):
         
         # Определяем устройство (CPU/CUDA)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -49,7 +101,7 @@ class QLearningAgent:
         
         # Оптимизатор и функция потерь
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=learning_rate)
-        self.criterion = nn.MSELoss()
+        self.criterion = nn.MSELoss(reduction='none')  # Используем reduction='none' для PER
         
         # Параметры обучения
         self.gamma = gamma
@@ -58,17 +110,17 @@ class QLearningAgent:
         self.epsilon_decay = epsilon_decay
         self.batch_size = batch_size
         
-        # Память для опыта
-        self.memory = deque(maxlen=memory_size)
+        # Память для опыта с приоритетами
+        self.memory = PrioritizedReplayBuffer(memory_size)
         
         # Включаем автоматическое смешанное вычисление точности только если есть CUDA
         self.use_amp = torch.cuda.is_available()
         if self.use_amp:
-            self.scaler = torch.cuda.amp.GradScaler()
-        
+            self.scaler = torch.amp.GradScaler('cuda')
+    
     def store_transition(self, state, action, reward, next_state, done):
-        self.memory.append((state, action, reward, next_state, done))
-        
+        self.memory.store(state, action, reward, next_state, done)
+    
     def select_action(self, state):
         if random.random() < self.epsilon:
             return random.randint(0, 3)
@@ -79,12 +131,15 @@ class QLearningAgent:
             return torch.argmax(q_values).item()
     
     def train(self):
-        if len(self.memory) < self.batch_size:
+        result = self.memory.sample(self.batch_size)
+        if result is None:
             return None
             
-        # Выборка мини-батча
-        batch = random.sample(self.memory, self.batch_size)
-        states, actions, rewards, next_states, dones = zip(*batch)
+        batch, weights, indices = result
+        states, actions, rewards, next_states, dones = batch
+        
+        if states is None or len(states) == 0:
+            return None
         
         # Преобразование в тензоры
         states = torch.FloatTensor(states).to(self.device)
@@ -92,6 +147,7 @@ class QLearningAgent:
         rewards = torch.FloatTensor(rewards).to(self.device)
         next_states = torch.FloatTensor(next_states).to(self.device)
         dones = torch.FloatTensor(dones).to(self.device)
+        weights = torch.FloatTensor(weights).to(self.device)
         
         # Обучение с или без AMP в зависимости от наличия CUDA
         if self.use_amp:
@@ -100,7 +156,10 @@ class QLearningAgent:
                 with torch.no_grad():
                     next_q_values = self.target_net(next_states).max(1)[0]
                     target_q_values = rewards + (1 - dones) * self.gamma * next_q_values
-                loss = self.criterion(current_q_values.squeeze(), target_q_values)
+                
+                # Вычисляем TD-ошибки и взвешенную функцию потерь
+                td_errors = (current_q_values.squeeze() - target_q_values).detach().cpu().numpy()
+                loss = (self.criterion(current_q_values.squeeze(), target_q_values) * weights).mean()
             
             self.optimizer.zero_grad()
             self.scaler.scale(loss).backward()
@@ -109,17 +168,22 @@ class QLearningAgent:
             self.scaler.step(self.optimizer)
             self.scaler.update()
         else:
-            # Обычное обучение без AMP
             current_q_values = self.policy_net(states).gather(1, actions.unsqueeze(1))
             with torch.no_grad():
                 next_q_values = self.target_net(next_states).max(1)[0]
                 target_q_values = rewards + (1 - dones) * self.gamma * next_q_values
-            loss = self.criterion(current_q_values.squeeze(), target_q_values)
+            
+            # Вычисляем TD-ошибки и взвешенную функцию потерь
+            td_errors = (current_q_values.squeeze() - target_q_values).detach().cpu().numpy()
+            loss = (self.criterion(current_q_values.squeeze(), target_q_values) * weights).mean()
             
             self.optimizer.zero_grad()
             loss.backward()
             torch.nn.utils.clip_grad_norm_(self.policy_net.parameters(), max_norm=1.0)
             self.optimizer.step()
+        
+        # Обновляем приоритеты в памяти
+        self.memory.update_priorities(indices, td_errors)
         
         # Обновляем epsilon
         self.epsilon = max(self.epsilon_min, self.epsilon * self.epsilon_decay)

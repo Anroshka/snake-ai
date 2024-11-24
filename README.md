@@ -1,95 +1,134 @@
-# Snake AI Learning Game
+# Snake AI with Deep Q-Learning
 
-An AI-powered Snake game that learns and improves through deep reinforcement learning using PyTorch.
+An advanced implementation of a Snake game AI that learns through Deep Q-Learning, featuring real-time visualization and performance optimizations.
 
-## Features
+## 🚀 Key Features
 
-- Deep Q-Learning implementation with PyTorch
-- CUDA support for GPU acceleration
-- Real-time visualization of the learning process
-- Automatic model checkpointing and saving of best models
-- Comprehensive training statistics display
-- Configurable hyperparameters
-- Smooth game animations with Pygame
+- 🧠 Deep Q-Network with Priority Experience Replay (PER)
+- 🎮 Real-time game visualization with informative HUD
+- 📊 Live training statistics and performance graphs
+- 🔄 Automatic checkpointing and model saving
+- ⚡ CUDA-accelerated training with AMP
+- 📈 Adaptive learning parameters
+- 🎯 Enhanced exploration/exploitation balance
 
-## Requirements
+## 🛠️ Technical Specifications
 
-- Python 3.10
-- PyTorch (with CUDA support recommended)
-- Pygame 2.4.0
-- NumPy
+- **Framework**: PyTorch with CUDA support
+- **Visualization**: Pygame, Matplotlib, Seaborn
+- **Neural Network**: 
+  - Input Layer: 12 neurons (state representation)
+  - Hidden Layer: 256 neurons
+  - Output Layer: 4 actions (movement directions)
+- **Training Parameters**:
+  - Learning Rate: 0.001
+  - Gamma: 0.99
+  - Initial Epsilon: 1.0
+  - Epsilon Decay: 0.995
+  - Memory Size: 100,000
+  - Batch Size: 128
 
-## Installation
+## 📊 Real-time Visualization
 
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/snake-ai.git
-cd snake-ai
-```
+- Current game score
+- Best score achieved
+- Rolling average (last 100 games)
+- Exploration rate (Epsilon)
+- Samples collected
+- Training performance (FPS)
+- Loss function evolution
+- Score distribution histogram
 
+## 🚀 Installation
+
+1. Clone the repository
 2. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. If you have an NVIDIA GPU, install PyTorch with CUDA support:
+For CUDA support (recommended):
 ```bash
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 ```
 
-## Usage
+## 💻 Usage
 
-1. Start training:
+Start training:
 ```bash
 python train.py
 ```
 
-2. Controls during training:
-- ESC: Stop training
-- Close window: Stop training
+## ⚙️ Performance Features
 
-## Project Structure
+- Multi-threaded processing
+- Automatic device selection (GPU/CPU)
+- Optimized rendering with FPS control
+- Gradient clipping for stability
+- Automatic Mixed Precision (AMP)
+- Priority Experience Replay
+- Efficient memory management
 
-- `game.py`: Snake game environment implementation
-- `model.py`: Deep Q-Network and training agent implementation
+## 🔄 Automatic Saving
+
+- Best model preservation
+- Checkpoints every 10 episodes
+- Training statistics graphs
+- Performance metrics tracking
+
+## 🎮 Controls
+
+- ESC: Exit training
+- Automatic gameplay during training
+- Visualization every 10 episodes
+- Training stats display
+
+## 📈 Training Graphs
+
+- Learning progress
+- Loss function
+- Epsilon decay
+- Score distribution
+- Moving averages
+
+## 🎯 Latest Improvements
+
+- Enhanced visualization with semi-transparent HUD
+- Stabilized FPS for better visualization
+- Minimum samples threshold for training start
+- Improved error handling and stability
+- Better memory management
+- Adaptive learning parameters
+
+## 📝 Requirements
+
+- Python 3.10+
+- CUDA-capable GPU (recommended)
+- PyTorch 2.0+
+- Pygame 2.4.0
+- Matplotlib and Seaborn for visualization
+
+## 🔧 Configuration
+
+All training parameters can be adjusted in `train.py`:
+- Episode count
+- Memory size
+- Batch size
+- Learning rate
+- Epsilon decay
+- Visualization frequency
+
+## 📚 Project Structure
+
+- `game.py`: Snake game environment
+- `model.py`: DQN implementation with PER
 - `train.py`: Training loop and visualization
-- `models/`: Directory for saved model checkpoints
-  - `best_model.pth`: Best performing model
-  - `checkpoint_X.pth`: Regular checkpoints every 100 episodes
+- `models/`: Saved models and checkpoints
 
-## Technical Details
+## 🤝 Contributing
 
-### Neural Network Architecture
-- Input: 12 feature state representation
-- Hidden layers: Two-layer architecture
-- Output: Q-values for possible actions
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-### Training Parameters
-- Learning Rate: 0.001
-- Discount Factor (gamma): 0.95
-- Initial Exploration Rate (epsilon): 1.0
-- Epsilon Decay: 0.997
-- Minimum Epsilon: 0.01
-- Replay Memory Size: Based on available system memory
-- Batch Size: Configurable
+## 📄 License
 
-### Performance Features
-- Automatic CUDA detection and utilization
-- Gradient clipping for training stability
-- Experience replay with deque
-- Target network for stable learning
-- Automatic Mixed Precision (AMP) training when CUDA is available
-
-## License
-
-MIT License - feel free to use this code for your own projects. For more details, see the [LICENSE](LICENSE) file.
-
-## Contributing
-
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-## Reporting Issues and Requesting Features
-
-If you encounter any issues or have ideas for new features, please open an issue on GitHub. Provide as much detail as possible, including steps to reproduce the issue, expected behavior, and any relevant screenshots or logs.
-
-For more information on contributing, see the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
