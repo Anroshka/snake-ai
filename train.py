@@ -61,7 +61,7 @@ def train():
     max_steps = 1000
     target_update_freq = 5
     render_freq = 10  # Показываем игру каждые 10 эпизодов
-    save_freq = 100   # Частота сохранения модели
+    save_freq = 10   # Сохраняем чекпоинт каждые 10 эпизодов
     
     # Отключаем синхронизацию CUDA для ускорения
     if torch.cuda.is_available():
