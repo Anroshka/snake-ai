@@ -100,6 +100,13 @@ python train.py
 - Better memory management
 - Adaptive learning parameters
 
+## 🚀 Next Steps
+
+- [ ] Improve visualization for better understanding
+- [ ] Optimize training process for faster convergence
+- [ ] Develop adaptive learning rate scheduling
+- [ ] Explore different state representations for better learning
+
 ## 📝 Requirements
 
 - Python 3.10+
