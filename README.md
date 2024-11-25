@@ -2,6 +2,25 @@
 
 An advanced implementation of a Snake game AI that learns through Deep Q-Learning, featuring real-time visualization and performance optimizations.
 
+## 📚 Table of Contents
+
+1. [🚀 Key Features](#-key-features)
+2. [🛠️ Technical Specifications](#️-technical-specifications)
+3. [📊 Real-time Visualization](#-real-time-visualization)
+4. [🚀 Installation](#-installation)
+5. [💻 Usage](#-usage)
+6. [⚙️ Performance Features](#-performance-features)
+7. [🔄 Automatic Saving](#-automatic-saving)
+8. [🎮 Controls](#-controls)
+9. [📈 Training Graphs](#-training-graphs)
+10. [🎯 Latest Improvements](#-latest-improvements)
+11. [🚀 Next Steps](#-next-steps)
+12. [📝 Requirements](#-requirements)
+13. [🔧 Configuration](#-configuration)
+14. [📚 Project Structure](#-project-structure)
+15. [🤝 Contributing](#-contributing)
+16. [📄 License](#-license)
+
 ## 🚀 Key Features
 
 - 🧠 Deep Q-Network with Priority Experience Replay (PER)
@@ -14,19 +33,19 @@ An advanced implementation of a Snake game AI that learns through Deep Q-Learnin
 
 ## 🛠️ Technical Specifications
 
-- **Framework**: PyTorch with CUDA support
-- **Visualization**: Pygame, Matplotlib, Seaborn
-- **Neural Network**: 
-  - Input Layer: 12 neurons (state representation)
-  - Hidden Layer: 256 neurons
-  - Output Layer: 4 actions (movement directions)
-- **Training Parameters**:
-  - Learning Rate: 0.001
-  - Gamma: 0.99
-  - Initial Epsilon: 1.0
-  - Epsilon Decay: 0.995
-  - Memory Size: 100,000
-  - Batch Size: 128
+| Feature          | Description                                      |
+|------------------|--------------------------------------------------|
+| **Framework**    | PyTorch with CUDA support                        |
+| **Visualization**| Pygame, Matplotlib, Seaborn                      |
+| **Neural Network**| Input Layer: 12 neurons (state representation)  |
+|                  | Hidden Layer: 256 neurons                        |
+|                  | Output Layer: 4 actions (movement directions)    |
+| **Training Parameters**| Learning Rate: 0.001                       |
+|                  | Gamma: 0.99                                      |
+|                  | Initial Epsilon: 1.0                             |
+|                  | Epsilon Decay: 0.995                             |
+|                  | Memory Size: 100,000                             |
+|                  | Batch Size: 128                                  |
 
 ## 📊 Real-time Visualization
 
