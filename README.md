@@ -20,12 +20,14 @@ An advanced implementation of a Snake game AI that learns through Deep Q-Learnin
 14. [📚 Project Structure](#-project-structure)
 15. [🤝 Contributing](#-contributing)
 16. [📄 License](#-license)
+17. [🛡️ Security](#-security)
+18. [📜 Code of Conduct](#-code-of-conduct)
 
 ## 🚀 Key Features
 
 - 🧠 Deep Q-Network with Priority Experience Replay (PER)
 - 🎮 Real-time game visualization with informative HUD
-- 📊 Multi-agent support (2-6 snakes training simultaneously)
+- 🐍 Multi-agent support (2-6 snakes training simultaneously)
 - 📊 Live training statistics and performance graphs
 - 🔄 Automatic checkpointing and model saving
 - ⚡ CUDA-accelerated training with AMP
@@ -174,8 +176,31 @@ All training parameters can be adjusted in `train_multi.py`:
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+We welcome contributions to Snake AI! Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on how to submit pull requests, report issues, and contribute to the project.
+
+Before contributing, please read our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🛡️ Security
+
+For details about our security policy and how to report security vulnerabilities, please see our [Security Policy](SECURITY.md).
+
+## 📜 Code of Conduct
+
+This project and everyone participating in it is governed by our [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
+
+## 🙏 Acknowledgments
+
+- Thanks to all contributors who have helped shape Snake AI
+- Special thanks to the PyTorch and Pygame communities
+- Inspired by various reinforcement learning implementations
+
+## 📞 Contact
+
+For questions and support, please:
+1. Check existing [Issues](https://github.com/Anroshka/snake-ai/issues)
+2. Create a new issue if needed
+3. Follow our [Security Policy](SECURITY.md) for reporting vulnerabilities
