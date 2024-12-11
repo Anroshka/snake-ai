@@ -31,8 +31,8 @@ def get_valid_input(prompt, min_val, max_val):
 def train():
     # Интерактивный ввод количества змеек
     print("\n=== Snake AI Training Configuration ===")
-    print("How many snakes would you like to train? (2-6 recommended)")
-    n_agents = get_valid_input("Enter number of snakes: ", 2, 6)
+    print("How many snakes would you like to train? (1-6 recommended)")
+    n_agents = get_valid_input("Enter number of snakes: ", 1, 6)
     
     print(f"\nInitializing training with {n_agents} snakes...")
     print("(Press Ctrl+C to stop training at any time)")
@@ -69,6 +69,9 @@ def train():
         print("Visual preview will be shown every 10 episodes")
         print("Training statistics will be saved in 'training_stats_multi.png'")
         print("\nPress Ctrl+C to stop training and save the current model")
+        
+        # Устанавливаем задержку в зависимости от количества змеек
+        step_delay = 0.1 if n_agents == 1 else 0.05
         
         for episode in range(n_games):
             states = game.reset()
@@ -111,10 +114,10 @@ def train():
                 if steps % 50 == 0:
                     agent.update_target_networks()
                 
-                # Отрисовываем игру только каждые 10 эпизодов
+                # Отрисовываем игру и добавляем задержку
                 if should_render:
                     game.render()
-                    time.sleep(0.05)
+                    time.sleep(step_delay)  # Добавляем задержку для лучшей визуализации
             
             # Сохраняем статистику
             avg_episode_score = np.mean(episode_scores)

@@ -73,14 +73,46 @@ class SnakeGame:
         self.active_agents = set(range(self.n_agents))
         self.game_over = False
         
-        # Позиции для начального размещения змеек (для двух змеек)
-        start_positions = [
-            (self.n_cells_x//4, self.n_cells_y//2),     # Левая змейка
-            (3*self.n_cells_x//4, self.n_cells_y//2),   # Правая змейка
-        ]
+        # Генерируем начальные позиции для змеек
+        start_positions = []
+        initial_directions = []
         
-        # Начальные направления для змеек
-        initial_directions = [(1,0), (-1,0)]  # Змейки смотрят друг на друга
+        if self.n_agents == 1:
+            # Для одной змейки - начало в центре
+            start_positions.append((self.n_cells_x // 2, self.n_cells_y // 2))
+            initial_directions.append((1, 0))  # Движение вправо
+        else:
+            # Для нескольких змеек - распределение по периметру
+            margin = 2
+            usable_width = self.n_cells_x - 2 * margin
+            usable_height = self.n_cells_y - 2 * margin
+            perimeter = 2 * (usable_width + usable_height)
+            
+            # Распределяем змеек равномерно по периметру
+            for i in range(self.n_agents):
+                # Определяем позицию на периметре (0 до perimeter)
+                pos = (i * perimeter) // self.n_agents
+                
+                # Определяем, на какой стороне периме��ра находится змейка
+                if pos < usable_width:  # Верхняя сторона
+                    x = margin + pos
+                    y = margin
+                    direction = (0, 1)  # Вниз
+                elif pos < usable_width + usable_height:  # Правая сторона
+                    x = margin + usable_width
+                    y = margin + (pos - usable_width)
+                    direction = (-1, 0)  # Влево
+                elif pos < 2 * usable_width + usable_height:  # Нижняя сторона
+                    x = margin + usable_width - (pos - (usable_width + usable_height))
+                    y = margin + usable_height
+                    direction = (0, -1)  # Вверх
+                else:  # Левая сторона
+                    x = margin
+                    y = margin + usable_height - (pos - (2 * usable_width + usable_height))
+                    direction = (1, 0)  # Вправо
+                
+                start_positions.append((int(x), int(y)))
+                initial_directions.append(direction)
         
         for i in range(self.n_agents):
             self.snakes.append([start_positions[i]])
@@ -288,13 +320,18 @@ class SnakeGame:
                 rewards[agent_idx] += 0.01
         
         # Проверяем условие окончания игры
-        self.game_over = len(self.active_agents) <= 1 or self.steps >= 1000  # Добавляем ограничение по шагам
+        if self.n_agents == 1:
+            # Для одной змейки игра заканчивается только при столкновении или превышении лимита шагов
+            self.game_over = len(self.active_agents) == 0 or self.steps >= 1000
+        else:
+            # Для нескольких змеек - когда осталась одна или превышен лимит шагов
+            self.game_over = len(self.active_agents) <= 1 or self.steps >= 1000
         
         # Если игра не закончена, даем бонус последней выжившей змейке
         if self.game_over:
-            if len(self.active_agents) == 1:
+            if self.n_agents > 1 and len(self.active_agents) == 1:
                 last_agent = list(self.active_agents)[0]
-                rewards[last_agent] += 20  # Бонус за победу
+                rewards[last_agent] += 20  # Бонус за победу только в мультиплеере
             elif self.steps >= 1000:
                 # Штраф всем за слишком долгую игру
                 for agent_idx in self.active_agents:
