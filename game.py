@@ -410,5 +410,6 @@ class SnakeGame:
         pygame.display.flip()
         self.clock.tick(30)  # Ограничиваем FPS
 
-    def close(self):
+    @staticmethod
+    def close():
         pygame.quit()
