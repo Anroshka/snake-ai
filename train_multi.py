@@ -124,6 +124,7 @@ def train():
             scores_window.append(avg_episode_score)
             scores_history.append(avg_episode_score)
             avg_score = np.mean(scores_window)
+            agent.step_schedulers(avg_score)
             avg_scores_history.append(avg_score)
 
             # Выводим прогресс с дополнительной информацией

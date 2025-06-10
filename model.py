@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torch.optim.lr_scheduler
 import numpy as np
 from collections import deque
 import random
@@ -101,6 +102,7 @@ class QLearningAgent:
 
         # Оптимизатор и функция потерь
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=learning_rate)
+        self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, 'max', patience=10, factor=0.1, verbose=True)
         self.criterion = nn.MSELoss(reduction='none')  # Используем reduction='none' для PER
 
         # Параметры обучения
@@ -194,12 +196,16 @@ class QLearningAgent:
     def update_target_network(self):
         self.target_net.load_state_dict(self.policy_net.state_dict())
 
+    def step_scheduler(self, metric):
+        self.scheduler.step(metric)
+
     def save_model(self, path):
         """Сохраняет модель и состояние обучения"""
         checkpoint = {
             'policy_net_state_dict': self.policy_net.state_dict(),
             'target_net_state_dict': self.target_net.state_dict(),
             'optimizer_state_dict': self.optimizer.state_dict(),
+            'scheduler_state_dict': self.scheduler.state_dict(),
             'epsilon': self.epsilon,
             'device': str(self.device)
         }
@@ -215,6 +221,10 @@ class QLearningAgent:
         self.policy_net.load_state_dict(checkpoint['policy_net_state_dict'])
         self.target_net.load_state_dict(checkpoint['target_net_state_dict'])
         self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        if 'scheduler_state_dict' in checkpoint:
+            self.scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
+        else:
+            print(f"Scheduler state not found in checkpoint {path}, using default scheduler state.")
         self.epsilon = checkpoint['epsilon']
 
         # Переносим модели на правильное устройство после загрузки
@@ -263,6 +273,10 @@ class MultiAgentDQN:
     def update_target_networks(self):
         for agent in self.agents:
             agent.update_target_network()
+
+    def step_schedulers(self, metric):
+        for agent in self.agents:
+            agent.step_scheduler(metric)
 
     def save_models(self, path):
         """Сохраняет модели всех агентов"""
